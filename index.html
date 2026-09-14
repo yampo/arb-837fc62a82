@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Árbol genealógico de la familia Garicoits: de Soule, el Bidasoa y Lugo al Río de la Plata.">
+<title>Árbol Garicoits</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --bg:#EEF0EB; --bg2:#E3E6DF; --panel:#F8F8F4; --ink:#1B2A2C; --ink2:#4A5A5C; --ink3:#7C8A8B;
+  --line:#B9C1BC; --rouge:#A0282B; --rouge-soft:#A0282B22; --green:#3D6B4F; --amber:#B7791F; --slate:#5B6C8F;
+  --card:#FBFBF8; --card-direct:#FFF4F3; --shadow:0 1px 2px #1B2A2C14, 0 6px 18px #1B2A2C10;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#161C1D; --bg2:#1E2627; --panel:#1C2324; --ink:#E6E9E4; --ink2:#B4BDB8; --ink3:#7F8A88;
+    --line:#3B4747; --rouge:#E06A6C; --rouge-soft:#E06A6C26; --green:#7DBB93; --amber:#E0A94F; --slate:#96A8CF;
+    --card:#232C2D; --card-direct:#332224; --shadow:0 1px 2px #0006, 0 6px 18px #0005;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#161C1D; --bg2:#1E2627; --panel:#1C2324; --ink:#E6E9E4; --ink2:#B4BDB8; --ink3:#7F8A88;
+  --line:#3B4747; --rouge:#E06A6C; --rouge-soft:#E06A6C26; --green:#7DBB93; --amber:#E0A94F; --slate:#96A8CF;
+  --card:#232C2D; --card-direct:#332224; --shadow:0 1px 2px #0006, 0 6px 18px #0005;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"IBM Plex Sans",system-ui,sans-serif;font-size:14px;line-height:1.45;padding-inline:16px;padding-block:0}
+h1,h2,h3{font-family:"Newsreader",Georgia,serif;font-weight:500;margin:0;text-wrap:balance}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--rouge);outline-offset:2px}
+
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 24px;padding-block:22px 14px;border-bottom:1px solid var(--line)}
+header h1{font-size:30px;line-height:1.05}
+header h1 em{font-style:italic;color:var(--rouge)}
+.sub{color:var(--ink2);max-width:66ch;margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink2);align-items:center}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.dot.doc{background:var(--green)} .dot.arbol{background:var(--slate)} .dot.fam{background:var(--amber)} .dot.hip{background:transparent;border:2px dashed var(--ink3)}
+.legend .dir{display:inline-block;width:18px;height:3px;background:var(--rouge);margin-right:5px;vertical-align:3px}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding-block:10px;font-size:13px}
+.toolbar .btn{border:1px solid var(--line);background:var(--panel);padding:5px 10px;border-radius:4px;color:var(--ink)}
+.toolbar .btn:hover{border-color:var(--ink3)}
+.toolbar .sp{flex:1}
+.toolbar .hint{color:var(--ink3);font-size:12px}
+.search{position:relative;flex:0 1 340px;min-width:200px}
+.search input{width:100%;font:inherit;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:6px 10px;outline:none}
+.search input:focus{border-color:var(--rouge)}
+.results{position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:20;list-style:none;margin:0;padding:4px;background:var(--panel);border:1px solid var(--line);border-radius:4px;box-shadow:var(--shadow);max-height:320px;overflow:auto}
+.results li button{display:block;width:100%;text-align:left;padding:6px 8px;border-radius:3px;line-height:1.25}
+.results li button:hover,.results li button.hi{background:var(--rouge-soft)}
+.results .rn{font-family:"Newsreader",Georgia,serif;font-size:15px}
+.results .rn b{font-weight:600}
+.results .rm{font:11px "IBM Plex Mono",monospace;color:var(--ink3)}
+.results .none{padding:6px 8px;color:var(--ink3);font-size:12.5px}
+
+.stage{position:relative;display:grid;grid-template-columns:1fr 340px;gap:14px;min-height:560px}
+@media (max-width:900px){.stage{grid-template-columns:1fr}}
+.canvas{overflow:auto;border:1px solid var(--line);background:
+ radial-gradient(var(--line) .7px, transparent .8px) 0 0/22px 22px, var(--bg2);border-radius:4px;cursor:grab;height:76vh;min-height:520px;user-select:none}
+.canvas.drag{cursor:grabbing}
+.zoom{transform-origin:0 0;padding:28px 40px 60px;display:inline-block;min-width:100%}
+
+/* section labels inside the canvas */
+.band{font:500 11px "IBM Plex Mono",monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);text-align:center;padding:6px 0}
+.band span{background:var(--bg2);padding:0 10px}
+
+/* tree */
+.tree,.tree ul{list-style:none;margin:0;padding:0;display:flex;justify-content:center}
+.tree ul{padding-top:26px;position:relative}
+.tree li{position:relative;padding:26px 8px 0;display:flex;flex-direction:column;align-items:center}
+.tree li::before,.tree li::after{content:"";position:absolute;top:0;right:50%;width:50%;height:26px;border-top:1.5px solid var(--line)}
+.tree li::after{right:auto;left:50%;border-left:1.5px solid var(--line)}
+.tree li:only-child::before,.tree li:only-child::after{border-top:0}
+.tree li:only-child{padding-top:0}
+.tree li:only-child::after{height:0}
+.tree li:first-child::before{border:0}
+.tree li:last-child::after{border-top:0}
+.tree li:first-child::after{border-radius:6px 0 0 0}
+.tree li:last-child::before{border-right:1.5px solid var(--line);border-radius:0 6px 0 0}
+.tree ul::before{content:"";position:absolute;top:0;left:50%;width:0;height:26px;border-left:1.5px solid var(--line)}
+.tree > li{padding-top:0}.tree > li::before,.tree > li::after{display:none}
+.tree li.direct-edge::after,.tree li.direct-edge:last-child::before{border-color:var(--rouge);border-width:2.5px}
+.tree li.direct-edge:only-child::after{border:0}
+.tree ul.direct-stem::before{border-color:var(--rouge);border-width:2.5px}
+/* ancestor charts: same tree, drawn upward */
+.tree.up{transform:scaleY(-1)}
+.tree.up .node{transform:scaleY(-1)}
+.tree.up ul::before,.tree.up li::before,.tree.up li::after{border-color:var(--rouge)}
+.tree.up li:only-child{padding-top:0}
+.tree.up li{padding-top:30px}
+
+.couple{display:grid;grid-template-columns:1fr auto 1fr;gap:18px;align-items:end;justify-items:center}
+.couple .ped{display:flex;flex-direction:column;align-items:center;width:100%}
+.couple .stem{width:0;height:26px;border-left:2.5px solid var(--rouge)}
+.couple .heart{align-self:end;padding-bottom:40px;font:11px "IBM Plex Mono",monospace;color:var(--ink3);text-align:center;white-space:nowrap}
+.down{display:flex;flex-direction:column;align-items:center}
+.down .stem{width:0;height:26px;border-left:2.5px solid var(--rouge)}
+.tree.desc > li > .cnode{display:none}
+.tree.desc > li > ul{padding-top:0}
+.tree.desc > li > ul::before{display:none}
+
+.node{display:flex;flex-direction:column;align-items:stretch;width:214px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:5px;box-shadow:var(--shadow);text-align:left;padding:9px 11px 8px;position:relative;width:100%}
+.card.direct{background:var(--card-direct);border-color:var(--rouge)}
+.card.sel{outline:2px solid var(--rouge);outline-offset:1px}
+.card .gen{position:absolute;top:6px;right:8px;font:500 10px "IBM Plex Mono",monospace;letter-spacing:.06em;color:var(--ink3)}
+.card .nm{font-family:"Newsreader",Georgia,serif;font-size:16px;line-height:1.15;font-weight:500;padding-right:22px}
+.card .nm .ap{font-weight:600}
+.card .dt{font:12px "IBM Plex Mono",monospace;color:var(--ink2);margin-top:4px;font-variant-numeric:tabular-nums}
+.card .role{color:var(--ink3);margin-top:2px;font-style:italic;font-family:"Newsreader",Georgia,serif;font-size:13px}
+.card .conf{position:absolute;left:-1px;top:-1px;bottom:-1px;width:4px;border-radius:5px 0 0 5px}
+.conf.doc{background:var(--green)} .conf.arbol{background:var(--slate)} .conf.fam{background:var(--amber)} .conf.hip{background:repeating-linear-gradient(180deg,var(--ink3) 0 4px,transparent 4px 8px)}
+.sp{margin-top:4px}
+.sp .card{background:var(--panel);border-style:dashed}
+.slot-b > .card:not(.direct){background:var(--panel);border-style:dashed}
+.sp .card.direct{border-style:solid}
+/* --- descendancy: couples side by side --- */
+.cnode{display:grid;grid-template-columns:214px 52px 214px;justify-items:stretch;align-items:stretch;position:relative}
+.cnode.single{grid-template-columns:214px}
+.slot-anc{position:absolute;bottom:100%;left:0;width:100%;display:flex;flex-direction:column;align-items:center}
+/* reserve the room the floating block needs, so sibling couples stay aligned */
+.tree ul.anc-room{padding-top:var(--ancpad,352px)}
+.tree ul.anc-room::before{height:var(--ancpad,352px)}
+.tree ul.anc-pill{padding-top:60px}
+.tree ul.anc-pill::before{height:60px}
+.slot-a{grid-column:1;grid-row:2;width:100%;display:flex}
+.slot-b{grid-column:3;grid-row:2;width:100%;position:relative;display:flex}
+.single .slot-a{grid-column:1}
+.cnode.swap .slot-a{grid-column:3}
+.cnode.swap .slot-b{grid-column:1}
+.slot-link{grid-column:2;grid-row:2;align-self:center;position:relative;display:flex;align-items:center;justify-content:center;width:100%;height:20px;color:var(--ink3);font-size:12px}
+.slot-link::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:1px solid var(--line)}
+.slot-link span{position:relative;background:var(--bg2);padding:0 3px}
+.slot-m{grid-column:1/4;grid-row:3;justify-self:center;font:11px "IBM Plex Mono",monospace;color:var(--ink3);text-align:center;padding-top:4px;line-height:1.25;max-width:100%}
+.single .slot-m{grid-column:1}
+.slot-k{grid-column:1/4;grid-row:4;padding-top:6px;display:flex;justify-content:center}
+.single .slot-k{grid-column:1}
+/* married-in ancestors, stacked above the spouse's own column */
+.slot-anc .acap{font:500 10px "IBM Plex Mono",monospace;letter-spacing:.07em;text-transform:uppercase;color:var(--ink3);padding-bottom:5px}
+.slot-anc .acap button{color:inherit;font:inherit;letter-spacing:inherit}
+.slot-anc .acap button:hover{color:var(--rouge)}
+.slot-anc .amar{font:11px "IBM Plex Mono",monospace;color:var(--ink3);padding:2px 0}
+.slot-anc .adrop{width:0;height:18px;border-left:2.5px solid var(--rouge)}
+.slot-anc .card{width:100%}
+.slot-a > .card,.slot-b > .card{width:100%}
+.ancbtn{font:11px "IBM Plex Sans",sans-serif;color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:var(--panel);margin-bottom:8px}
+.ancbtn:hover{border-color:var(--rouge);color:var(--rouge)}
+.marr{font:11px "IBM Plex Mono",monospace;color:var(--ink3);text-align:center;padding:2px 0;line-height:1.2}
+.kids{align-self:center;font-size:12px;color:var(--ink2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;background:var(--panel)}
+.kids.top{margin:0 0 6px}
+.kids:hover{border-color:var(--rouge);color:var(--rouge)}
+.kids.open{color:var(--ink3)}
+
+/* panel */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px;padding:16px 18px;overflow:auto;max-height:76vh}
+.panel h2{font-size:22px;line-height:1.1}
+.panel .eyebrow{font:500 11px "IBM Plex Mono",monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:6px}
+.panel .pill{display:inline-block;font-size:11.5px;padding:2px 9px;border-radius:999px;margin:8px 0 2px;color:#fff}
+.pill.doc{background:var(--green)} .pill.arbol{background:var(--slate)} .pill.fam{background:var(--amber)} .pill.hip{background:var(--ink3)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:12px 0;font-size:13px}
+.kv dt{color:var(--ink3);font-size:12px;padding-top:1px}.kv dd{margin:0}
+.kv dd.mono{font-family:"IBM Plex Mono",monospace;font-variant-numeric:tabular-nums}
+.panel p{margin:8px 0;font-size:13px;color:var(--ink2)}
+.panel .warn{border-left:3px solid var(--amber);padding:6px 10px;background:var(--bg);font-size:12.5px;margin:10px 0}
+.panel h3{font-size:12px;font-family:"IBM Plex Mono",monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);margin:14px 0 6px;font-weight:500}
+.src{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px}
+.src li{font-size:12.5px;padding-left:12px;position:relative;line-height:1.35}
+.src li::before{content:"";position:absolute;left:0;top:7px;width:5px;height:5px;border-radius:50%;background:var(--line)}
+.src a{color:var(--rouge);text-decoration:none;word-break:break-word}
+.src a:hover{text-decoration:underline}
+.rel{display:flex;flex-wrap:wrap;gap:5px}
+.rel button{border:1px solid var(--line);background:var(--card);border-radius:4px;padding:3px 8px;font-size:12px;text-align:left}
+.rel button:hover{border-color:var(--rouge)}
+.empty{color:var(--ink3);font-size:13px}
+
+/* notes */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px 28px;padding-block:26px 40px;border-top:1px solid var(--line);margin-top:16px}
+.notes h2{font-size:20px;margin-bottom:6px}
+.notes p{margin:6px 0;color:var(--ink2);font-size:13.5px;max-width:60ch}
+.notes .todo{padding-left:0;list-style:none;margin:6px 0}
+.notes .todo li{padding:5px 0;border-bottom:1px dashed var(--line);font-size:13px}
+.notes .todo li b{color:var(--ink);font-weight:500}
+.notes a{color:var(--rouge);text-decoration:none}.notes a:hover{text-decoration:underline}
+@media (prefers-reduced-motion:no-preference){.card{transition:box-shadow .15s}.card:hover{box-shadow:0 2px 4px #1B2A2C22,0 10px 24px #1B2A2C1a}}
+</style>
+</head>
+<body>
+
+
+<header>
+  <div>
+    <h1>Familia <em>Garicoits</em> · de Soule, el Bidasoa y Lugo al Río de la Plata</h1>
+    <div class="sub">Línea paterna de Juan Pablo Garicoits: la ascendencia de Pedro Garicoits y Fermina Espelosín hacia arriba (Gotein-Libarrenx y Ordiarp en Soule; Sumbilla en Navarra, hasta el siglo XVII) su descendencia hacia abajo, y la línea gallega de la abuela Dolores Reboredo, que arranca en Outeiro de Rei (Lugo). Cada persona lleva su nivel de evidencia y sus fuentes. Versión 12, 14 set 2026.</div>
+  </div>
+  <div class="legend">
+    <span><span class="dir"></span>línea directa</span>
+    <span><span class="dot doc"></span>documento primario</span>
+    <span><span class="dot arbol"></span>árboles públicos que citan actas</span>
+    <span><span class="dot fam"></span>dato de familia</span>
+    <span><span class="dot hip"></span>hipótesis / dudoso</span>
+  </div>
+</header>
+
+<div class="toolbar">
+  <button class="btn" id="btnExpand">Abrir todo</button>
+  <button class="btn" id="btnDirect">Vista compacta</button>
+  <button class="btn" id="btnZoomOut">−</button>
+  <button class="btn" id="btnZoomIn">+</button>
+  <button class="btn" id="btnFit">100 %</button>
+  <button class="btn" id="btnTop">Ir al origen</button>
+  <button class="btn" id="btnMe">Ir a Juan Pablo</button>
+  <span class="sp"></span>
+  <div class="search"><input id="q" type="search" placeholder="Buscar persona, apellido o lugar…" autocomplete="off" aria-label="Buscar en el árbol"><ul class="results" id="results" hidden></ul></div>
+  <span class="hint" style="flex-basis:100%">Arrastrá para desplazarte · clic en una persona para ver detalle y fuentes · ⌘/Ctrl + rueda para zoom</span>
+</div>
+
+<div class="stage">
+  <div class="canvas" id="canvas"><div class="zoom" id="zoom"></div></div>
+  <aside class="panel" id="panel"><div class="empty">Seleccioná a alguien del árbol.</div></aside>
+</div>
+
+<section class="notes">
+  <div>
+    <h2>Qué está probado y qué no</h2>
+    <p><b>Uruguay, con actas.</b> Una sesión en FamilySearch con la cuenta de Juan convirtió en documento buena parte de lo que eran datos de árbol. El nacimiento de Juan Francisco quedó fijado: 22 de febrero de 1901, inscrito el 2 de marzo en Villa del Cerro, hijo de Francisco <i>Graciano</i> Garicoits Espelosín y Felicia Imaz — o sea que el segundo nombre que la familia recordaba, y que yo había marcado como no verificado, era correcto. La defunción de Francisco está inscrita el 4 de enero de 1914 en Montevideo, con sus padres nombrados. Y Pedro Francisco, el hijo más dudoso de Pedro y Fermina, resultó real: casado con Isabel Gadea, con cuatro hijos y defunción en 1931.</p>
+    <p><b>Los Imaz, que eran un muro.</b> Ningún árbol público daba los padres de Felicia. Las actas de sus hijos la nombran con segundo apellido — Imaz Muñoa — y el bautismo de su hijo Roberto la da como hija de <b>Juan Imaz</b> y <b>María Simona Muñoa</b>. Desde ahí la línea sube dos generaciones más: Juan Imaz Gorostide (1850 – 19 jun 1919), hijo de Gerónimo Imaz y Ana Antonia Gorostide; y María Simona Muñoa Iraola, nacida en 1852 <i>en Villa del Cerro</i> y muerta en 1936, hija de Manuela Iraola y de un Muñoa que los índices llaman Miguel en un lado y Alejandro en otro. Felicia murió en 1936, el mismo año que su madre. Detalle bonito: dos hermanos Imaz se casaron con dos hermanas Muñoa, y toda esa colonia vasca vivía en el mismo barrio que los Garicoits.</p>
+    <p><b>Origen de Pedro.</b> Los árboles decían "Poitière, Creuse" (no existe). Un anuncio judicial de 1883 en <i>L'Indépendant des Basses-Pyrénées</i> (Gallica) nombra a la viuda Marie Lahunsungoity y a los hijos de Bernard Garicoix, entre ellos un "Pédrito Garicoix", todos de Gotein-Libarrenx (Soule) y "sin domicilio conocido en Francia ni en el extranjero", es decir emigrados. El apellido "Lahunsagoitz" que le atribuían a Pedro es el de la madre. Encaja con un Pedro nacido c. 1837 de un matrimonio de 1834 en Ordiarp. Es una identificación muy probable, no probada: falta el acta de nacimiento en Gotein-Libarrenx.</p>
+    <p><b>Sumbilla.</b> La línea Espelosín está indexada en FamilySearch (bautismos y matrimonios de Sumbilla desde 1618) con identificadores de acta citados por los árboles; hasta la generación de 1660-1690 es sólida. Más arriba (Zozaya, Araníbar, hasta 1460) los árboles tienen contradicciones cronológicas y se omite aquí.</p>
+    <p><b>La diéresis.</b> Juan Pablo y su padre están inscritos como <i>Garicoïts</i>. El tréma es ortografía francesa: sin él, "oi" se lee /wa/; con él se lee o-i, como en el vasco Garikoitz. En Soule, de donde viene Pedro, el apellido se escribía <i>Garicoix</i>; en Uruguay los documentos de la familia (1888-1951) dicen Garicoits o Garicoitz, sin diéresis, y así lo usan Fermín, la parroquia de Los Vascos y el Diario Oficial. La ï aparece recién a fines del siglo XX en dos ramas (la de Miguel Ángel en Argentina y la de Francisco Faig Garicoïts en Montevideo): lo más probable es una adopción culta de la forma "correcta" francesa, la del santo. Incidencia práctica: nula para viajar (ICAO translitera Ï→I en la zona de lectura mecánica de todo pasaporte), baja en trámites (una diéresis omitida no invalida actos, pero conviene que acta y DNI coincidan en un mismo expediente de apostilla). No conviene rectificarlo.</p>
+    <p><b>La línea de la abuela.</b> El Boletín Oficial de la provincia de Lugo del 26 de junio de 1929 registra, entre los mozos prófugos del Ayuntamiento de Otero de Rey, a <i>"Isauro Reboredo Lamas, de Manuel y Filomena, en Buenos Aires"</i> — verificado sobre la imagen original. Por la Ley de Reclutamiento de 1912 ese reemplazo alistaba a los nacidos en 1908. A eso se suma ahora un segundo hermano: <b>Manuel Reboredo Lamas, nacido el 16 de julio de 1915 y bautizado en la parroquia de San Telmo, Buenos Aires</b>, hijo de Manuel Reboredo y Filonila Lamas. Entre los dos acotan la emigración a 1908-1913 y, sobre todo, dan la parroquia porteña de la familia: la partida de Dolores debería estar en ese mismo libro.</p>
+    <p>Esto corrige una conclusión anterior y matiza otra. El origen no es la comarca de Deza, en Pontevedra, adonde apuntaba la distribución del apellido Reboredo, sino <b>Outeiro de Rei, en Lugo</b>. En cuanto al nombre de la bisabuela, yo había concluido que se llamaba Filomena y que "Filonila" era una deformación americana; el bautismo de San Telmo dice <i>Filonila</i>, igual que el acta uruguaya de 1951. Así que conviven las dos formas y la pregunta sigue abierta: lo único seguro es que la pista onomástica que la situaba en Castilla no se sostiene.</p>
+    <p><b>Vías cerradas, para no repetirlas.</b> Con la cuenta de Juan en Geneanet y FamilySearch quedaron descartadas cuatro. Geneanet <b>no tiene registros de archivo indexados</b> para Gotein-Libarrenx: los 65 resultados del apellido allí son 63 árboles y 2 recortes de prensa, así que el acta de nacimiento de Pierre no se alcanza por ahí. El apellido <b>Garicoix no aparece ni una vez en Uruguay</b> en Geneanet — la familia castellanizó a Garicoits al llegar. La <b>defunción de Pedro de 1918 no está indexada</b> en el registro civil uruguayo de FamilySearch, así que la confirmación de Soule no vendrá de ese lado. Y lo más importante para la rama gallega: <b>ninguna de las 28 parroquias de Outeiro de Rei está entre las imágenes navegables de la colección de Lugo</b>, ni aparece en su índice — los Reboredo indexados son de Monte de Meda, A Pobra do Brollón, Belmil y Castro de Beiro. El bautismo de Isauro solo puede salir del Archivo Diocesano de Lugo.</p>
+    <p><b>Un dato que vale la pena tener presente:</b> los bautismos de la diócesis de Lugo consignan, además de los padres, <b>los nombres de los cuatro abuelos y su lugar de residencia</b>. Cuando aparezca la partida de Isauro de 1908, no sube una generación: sube dos.</p>
+    <p><b>Sin resolver.</b> Los padres de Felicia Imaz: ningún árbol los da. Los padres de Francisca Dorotea Goñi (Joaquín Goñi de Alberro y Estefanía Lecuna de Alcega): solo nombres. La ciudad argentina donde nació Dolores. Y los padres de Manuel Reboredo y de Filomena Lamas, que ahora tienen una dirección concreta donde buscarlos.</p>
+  </div>
+  <div>
+    <h2>Próximos pasos con más rendimiento</h2>
+    <ul class="todo">
+      <li><b>El bautismo de Isauro, 1908, en una parroquia de Outeiro de Rei</b> — sigue siendo el paso que más rinde, porque da los cuatro abuelos de una vez. Pero se comprobó que FamilySearch no tiene esas parroquias ni indexadas ni en imágenes: hay que pedirlo por escrito al <b>Arquivo Central Parroquial Diocesano de Lugo</b> (archivo@diocesisdelugo.org, +34 982 231 143), indicando parroquia, año y nombres. Orden sugerido de parroquias: <b>Silvarrei</b> — el Boletín de 1907 sitúa allí una familia Reboredo —, después <b>Vilela</b>, Outeiro de Rei (San Xoán) y Robra.</li>
+      <li><b>La partida de bautismo de Dolores en San Telmo, Buenos Aires</b> — el bautismo de su hermano Manuel en 1916 en esa parroquia dice que la familia era feligresa allí. La colección de Capital Federal de FamilySearch está indexada solo en parte y Dolores no aparece, así que toca el libro parroquial o el Arzobispado de Buenos Aires.</li>
+      <li><b>El legajo del matrimonio de 1951, no la partida</b> — para casar a una extranjera, la 5ª sección de Canelones exigió a Dolores su partida de nacimiento argentina legalizada. Esa carpeta dice la ciudad exacta. Pedir a la DGREC el <i>expediente</i> del acta n.º 79: <a href="https://www.gub.uy/tramites/solicitud-partidas-matrimonio">gub.uy/tramites/solicitud-partidas-matrimonio</a>.</li>
+      <li><b>Centro Lucense de Buenos Aires</b> — la sociedad de los emigrantes de Lugo, exactamente el colectivo de esta familia. Su fondo está en el <a href="https://arquivo.consellodacultura.gal/index.php/centro-lucense-de-buenos-aires-2">Arquivo da Emigración Galega</a>. Si conserva fichas de socios, ahí puede estar Manuel con su parroquia de origen y su dirección porteña.</li>
+      <li><b>Acta de defunción argentina de Manuel y de Filomena</b> — <a href="https://www.familysearch.org/search/record/results?q.surname=Reboredo&q.givenName=Manuel&f.collectionId=5000077">Registro Civil de Buenos Aires 1811-1980</a>. Las actas porteñas suelen decir "natural de [parroquia], España".</li>
+      <li><b>CEMLA</b> — <a href="https://cemla.com/buscador/">cemla.com/buscador</a>, con captcha manual: Reboredo entre 1908 y 1913, ahora con una ventana de llegada precisa. El AGN argentino, que no tiene captcha, estaba caído el 14 set 2026.</li>
+      <li><b>Acta de nacimiento de Pierre Garicoix, Gotein-Libarrenx, 1835-1840</b> — <a href="https://earchives.le64.fr/archives-en-ligne/ead.html?id=FRAD064003_IR0002&c=FRAD064003_IR0002_G696">Archives des Pyrénées-Atlantiques</a>, gratis y sin login. Cierra la duda del origen de Pedro.</li>
+      <li><b>Nacimiento de Juan Francisco (1901) y matrimonio Garicoits–Imaz (c. 1900)</b> — "Uruguay, registro civil 1879-1930" en FamilySearch: única vía para los padres de Felicia Imaz.</li>
+      <li><b>Escribirle a Bertrand Laplume (blaplume) desde tu cuenta de Geneanet</b> — es la acción de mayor retorno de todo el proyecto. Su propia presentación dice que su base combina documentos familiares, horas en los archivos departamentales de Pau y <i>contactos con las familias suletinas emigradas a América Latina</i>. Es decir: trabaja exactamente este problema. Tiene botón de contacto en cada ficha. También carjane3 / carmen2024 (Carmen Jane de Carlos, la línea de Sumbilla con las actas) y magorr (nieta de María Celia, prima segunda de tu padre).</li>
+    </ul>
+  </div>
+</section>
+
+<script>
+const G3="https://gw.geneanet.org/carjane3?lang=es&", G2="https://gw.geneanet.org/carmen2024?lang=es&";
+const FS="https://www.familysearch.org/search/record/results?";
+const P = {
+ /* ===== Garicoix / Lahunsungoity — Soule ===== */
+ salaber:{n:"Bernard",a:"Garicoix",b:"1760",d:"1820",bp:"Gotein (Soule)",c:"arbol",role:"casa Garicoix de Gotein-Libarrenx",
+  note:"Casado con Marianne Iritcity (n. 1756). Datos del árbol de Bertrand Laplume, que declara trabajar sobre documentos familiares, horas en los archivos departamentales de Pau y contactos con familias suletinas emigradas a América Latina.",
+  warn:"Una lectura anterior lo daba como \"Bernard Salaber, heredero de Garicoix, 1754-1824\". La ficha del árbol dice Bernard Garicoix, 1760-1820. Corrijo a lo que dice la fuente.",
+  src:[["Geneanet blaplume — ficha de Bernard Garicoitz (1804)","https://gw.geneanet.org/blaplume?lang=es&n=garicoitz&p=bernard&type=fiche"]]},
+ iritcity:{n:"Marianne",a:"Iritcity",b:"1756",c:"arbol",src:[["Geneanet blaplume","https://gw.geneanet.org/blaplume?lang=es&n=garicoitz&p=bernard&type=fiche"]]},
+ bernard1780:{n:"Bernard",a:"Garicoix",b:"1780",d:"1818",bp:"Gotein (Soule)",c:"arbol",note:"Casado con Madeleine Etchecopar.",src:[["Geneanet blaplume","https://gw.geneanet.org/blaplume?lang=fr&n=garicoitz&p=bernard"]]},
+ etchecopar:{n:"Madeleine",a:"Etchecopar",b:"1780",d:"1855",c:"arbol",note:"Hija de Dominique Etchecopar y Marie Cadette Etchecopar Irichabeau.",src:[["Geneanet blaplume","https://gw.geneanet.org/blaplume?lang=es&n=garicoitz&p=bernard&type=fiche"]]},
+ dominique_etch:{n:"Dominique",a:"Etchecopar",b:"1746",d:"1796",c:"arbol",note:"Su ascendencia sigue en el árbol de Laplume hasta los Etchecopar, Ducque, Carrique y Luro de Soule, con individuos nacidos hacia 1670.",src:[["Geneanet blaplume — árbol de Bernard Garicoitz","https://gw.geneanet.org/blaplume?lang=es&n=garicoitz&p=bernard&type=tree"]]},
+ cadette_etch:{n:"Marie Cadette",a:"Etchecopar Irichabeau",d:"1808",c:"arbol",src:[["Geneanet blaplume","https://gw.geneanet.org/blaplume?lang=es&n=garicoitz&p=bernard&type=tree"]]},
+ grachine:{n:"Grachine",a:"Garicoitz",b:"1810",c:"arbol",role:"hermana de Bernard",src:[["Geneanet blaplume","https://gw.geneanet.org/blaplume?lang=es&n=garicoitz&p=bernard&type=fiche"]]},
+ bernard1804:{n:"Bernard",a:"Garicoix (Garicoitz)",b:"15 mar 1804",bp:"Gotein, Soule",d:"antes de may 1883",dp:"",c:"doc",role:"cultivador · casa Garicoix, Gotein-Libarrenx",
+  note:"Ficha verificada en Geneanet: nacido el 15 de marzo de 1804 en Gotein, hijo de Bernard Garicoix (1780-1818) y Madeleine Etchecopar (1780-1855), fallecido en Gotein. Casado el 21 ago 1834 en Ordiarp con Marie Lahunxengoity. Su hermana fue Grachine Garicoitz (n. 1810). El árbol no lista a sus hijos, así que Pierre no aparece ahí. Un anuncio judicial de 1883 (venta por expropiación de la casa Garicoix) lo da como fallecido y nombra a su viuda y a sus hijos Jean, Jean-Pierre, Pédrito, Engrâce, Madeleine y Marie, \"antes domiciliados en Gotein-Libarrenx, actualmente sin domicilio ni residencia conocidos en Francia ni en el extranjero\".",
+  warn:"Que este Bernard sea el padre de nuestro Pedro es una identificación por convergencia (apellido materno Lahunsungoity = \"Lahunsagoitz\" de los árboles; \"Pédrito\"; matrimonio 1834 → hijo c. 1837; familia emigrada). Muy probable, no probada con acta.",
+  src:[["L'Indépendant des Basses-Pyrénées, 14 set 1883, p. 4 (Gallica, verificado por OCR)","https://gallica.bnf.fr/ark:/12148/bpt6k52643346/f4"],["Geneanet blaplume — Bernard Garicoitz","https://gw.geneanet.org/blaplume?lang=fr&n=garicoitz&p=bernard"]]},
+ marie_lah:{n:"Marie",a:"Lahunsungoity",b:"c. 1804",bp:"Ordiarp, Soule",d:"después de 1883",c:"doc",role:"casa Lahunsungoity de Ordiarp",
+  note:"Grafías: Lahunxengoity, Lahunsengoity. Viuda en 1883, cuando se remató la casa Garicoix. Es el \"Lahunsagoitz\" que los árboles uruguayos daban como segundo apellido de Pedro.",
+  warn:"Nacida en 1804 en Ordiarp. El árbol de Laplume no le asigna padres: lo de Pierre de Lahunsungoity y Marguerite de Jaureguiberry sigue siendo hipótesis sin acta.",
+  src:[["L'Indépendant des Basses-Pyrénées, 14 set 1883","https://gallica.bnf.fr/ark:/12148/bpt6k52643346/f4"],["Geneanet blaplume — Marie Lahunxengoity","https://gw.geneanet.org/blaplume?lang=fr&n=lahunxengoity&p=marie"],["Geneanet jaah51 — casa Lahunsungoity, Ordiarp","https://gw.geneanet.org/jaah51?lang=es&n=de+lahunsungoity&oc=3&p=pierre"]]},
+ pierre_lah:{n:"Pierre",a:"de Lahunsungoity",c:"hip",role:"maître de maison, Ordiarp",note:"Contrato matrimonial 1803 en Mauléon con Marguerite de Jaureguiberry. Hipótesis: podría ser el padre de Marie.",src:[["Geneanet jaah51","https://gw.geneanet.org/jaah51?lang=es&n=de+lahunsungoity&oc=2&p=pierre"]]},
+ jaureguiberry:{n:"Marguerite",a:"de Jaureguiberry",c:"hip",src:[["Geneanet jaah51","https://gw.geneanet.org/jaah51?lang=es&n=de+lahunsungoity&oc=2&p=pierre"]]},
+
+ /* ===== Espelosín — Sumbilla ===== */
+ juan_imaz:{n:"Juan",a:"Imaz Gorostide",b:"1850",d:"19 jun 1919",dp:"Montevideo",c:"doc",role:"bisabuelo de Miguel Ángel",
+  note:"Defunción registrada el 20 jun 1919 en Montevideo, con 69 años. Casado con María Simona Muñoa Iraola. Padre de Felicia y de al menos diez hijos más. Su hermano Pedro Imaz Gorostidi se casó con María Andrea Muñoa Iraola: dos hermanos Imaz casados con dos hermanas Muñoa, un patrón vasco clásico. La familia vivía en Villa del Cerro, el mismo barrio que los Garicoits.",
+  warn:"No consta dónde nació. Si fue en Gipuzkoa, el inmigrante fue él; si fue en Uruguay, lo fue su padre Gerónimo. Es la próxima pregunta de esta rama.",
+  src:[["FamilySearch — Uruguay, Registro Civil 1879-2020, defunción 20 jun 1919",FS+"q.givenName=Juan&q.surname=Imaz%20Gorostide&f.recordCountry=Uruguay"]]},
+ simona_munoa:{n:"María Simona",a:"Muñoa Iraola",b:"1852",bp:"Villa del Cerro, Montevideo",d:"1936",dp:"Montevideo",c:"doc",role:"bisabuela de Miguel Ángel",
+  note:"Nacida en Villa del Cerro en 1852, lo que prueba que los Muñoa ya estaban en Uruguay a mediados del siglo XIX. Murió en 1936, el mismo año que su hija Felicia.",
+  warn:"Los índices discrepan sobre su padre: un registro civil lo da como \"Alejandro\" y un registro parroquial como \"Miguel\". La madre es consistentemente Manuela Iraola. Hay que ver las actas.",
+  src:[["FamilySearch — Uruguay, Registro Civil 1879-2020",FS+"q.givenName=Maria%20Simona&q.surname=Munoa&f.recordCountry=Uruguay"]]},
+ geronimo_imaz:{n:"Gerónimo",a:"Imaz",c:"doc",role:"tatarabuelo de Miguel Ángel",note:"Nombrado como padre de Juan Imaz en el acta de defunción de este (1919). Sin más datos todavía.",src:[["FamilySearch — defunción de Juan Imaz Gorostide, 1919",FS+"q.givenName=Juan&q.surname=Imaz%20Gorostide&f.recordCountry=Uruguay"]]},
+ ana_gorostide:{n:"Ana Antonia",a:"Gorostide",c:"doc",note:"Nombrada como madre de Juan Imaz en el acta de defunción de 1919. Gorostidi es apellido guipuzcoano.",src:[["FamilySearch — defunción de Juan Imaz Gorostide, 1919",FS+"q.givenName=Juan&q.surname=Imaz%20Gorostide&f.recordCountry=Uruguay"]]},
+ miguel_munoa:{n:"Miguel (¿o Alejandro?)",a:"Muñoa",c:"hip",role:"tatarabuelo de Miguel Ángel",note:"Padre de María Simona. Un registro parroquial lo llama Miguel; uno civil, Alejandro. Sin resolver.",src:[["FamilySearch — registros de María Simona Muñoa",FS+"q.givenName=Maria%20Simona&q.surname=Munoa&f.recordCountry=Uruguay"]]},
+ manuela_iraola:{n:"Manuela",a:"Iraola",c:"doc",note:"Madre de María Simona, nombrada de forma consistente en los índices (Yraola, Freola). Iraola es apellido guipuzcoano.",src:[["FamilySearch — registros de María Simona Muñoa",FS+"q.givenName=Maria%20Simona&q.surname=Munoa&f.recordCountry=Uruguay"]]},
+ manuel_rl:{n:"Manuel",a:"Reboredo Lamas",b:"16 jul 1915",bp:"Buenos Aires",c:"doc",role:"hermano menor de Dolores",
+  note:"Bautizado el 12 dic 1916 en la parroquia de San Pedro González Telmo, barrio de San Telmo, Buenos Aires, hijo de Manuel Reboredo y Filonila Lamas. Es el único registro argentino de la familia hallado hasta ahora, y localiza su parroquia: Dolores, nacida el 14 dic 1913, debería estar bautizada allí mismo.",
+  src:[["FamilySearch — Argentina, Capital Federal, registros parroquiales 1640-1978",FS+"q.fatherGivenName=Manuel&q.fatherSurname=Reboredo&q.motherSurname=Lamas"]]},
+ pedro_apez:{n:"Pedro",a:"Espelosín Apezarena",b:"20 oct 1618",bp:"Sumbilla",d:"1670",c:"hip",note:"Casado 20 set 1643 en Sumbilla con Mariana Aguirre. Datos de carmen2024 vía MyHeritage, sin acta citada. Sus padres (Pedro Spolosin y Graciana Apezarena, 1595-1650) solo constan por nombre.",src:[["Geneanet carmen2024",G2+"n=espelosin+apezarena&p=pedro"]]},
+ mariana_ag:{n:"Mariana",a:"Aguirre",b:"c. 1622",bp:"Sumbilla",d:"1 oct 1679",c:"hip",src:[["Geneanet carmen2024",G2+"n=aguirre&p=mariana"]]},
+ andres:{n:"Andrés",a:"Espelosín Aguirre",b:"1 oct 1653",bp:"Sumbilla",d:"1710",c:"arbol",note:"Matrimonio 25 feb 1685, Sumbilla (FamilySearch ark C9PZ-6VN2) con María de Agesta. Fecha de nacimiento solo en carmen2024 (MyHeritage).",src:[["Geneanet carjane3",G3+"n=espelosin&p=andres"],["Geneanet carmen2024",G2+"n=espelosin+aguirre&p=andres"]]},
+ maria_agesta_ub:{n:"María",a:"de Agesta Ubiria",b:"13 ago 1655",bp:"Lesaka",d:"1715",dp:"Sumbilla",c:"arbol",note:"Hija de Phelippe Agesta (Lesaka) y Ana María Ubiria Marichalar (n. 1628, Lesaka), según carmen2024 sin acta.",src:[["Geneanet carmen2024",G2+"n=agesta+ubiria&p=maria&oc=1"]]},
+ jacobe:{n:"Jacobe",a:"de Arrechea Ezpeleta",b:"3 may 1629",bp:"Sumbilla",c:"arbol",role:"\"Señor de Beloaga\"",note:"Bautismo en \"España, bautismos 1502-1940\" (ark H6PZ-31W2). Hijo de Juanes de Arrechea y Ana Ezpeleta (casados 1621, Sumbilla). Casado 1656 con Anna de Araníbar Endara.",src:[["Geneanet carjane3",G3+"n=de+arrechea+ezpeleta&p=jacobe"]]},
+ anna_aranibar:{n:"Anna",a:"de Araníbar Endara",b:"1 ene 1626",bp:"Sumbilla",c:"arbol",note:"Hija de Joanes Araníbar Juanterre (casado 1614) y María Endara Irisarri; la línea Araníbar sigue en carmen2024 hasta el palacio de Araníbar de Aranaz (s. XVI) con referencias a pleitos del Archivo General de Navarra, pero con fechas inconsistentes.",src:[["Geneanet carmen2024",G2+"n=aranibar+endara&p=anna"]]},
+ martin_arr:{n:"Martín",a:"Arrechea de Araníbar",b:"19 ene 1666",bp:"Sumbilla",c:"arbol",role:"\"Señor de Beloaga\"",note:"Bautismo ark H6PC-PD3Z; matrimonio 25 mar 1687, Sumbilla (ark C9NM-Q83Z).",src:[["Geneanet carjane3",G3+"n=arrechea+de+aranibar&p=martin"]]},
+ maria_agesta_zoz:{n:"María",a:"de Agesta Zozaya",b:"25 mar 1666",bp:"Sumbilla",c:"arbol",note:"Hija de Joanes Agesta Ezpeleta (n. 1629; matrimonio 1650, ark C9NZ-GKPZ) y Graciana Zozaya Arruertena (bautizada 1632).",warn:"Graciana Zozaya aparece dos veces en la ascendencia con cronología imposible; la generación anterior está sin resolver.",src:[["Geneanet carmen2024",G2+"n=agesta+zozaya&p=maria"]]},
+ pedro_agesta:{n:"Pedro",a:"Espelosín Agesta",b:"25 feb 1688",bp:"Sumbilla",c:"arbol",note:"Bautismo ark H6PH-ZTZM; matrimonio 1 set 1710, Sumbilla (ark C9V5-PT2M). Hermanos: Mariana (1686), Ana Brígida (1690), Gerónimo (1693).",src:[["Geneanet carjane3",G3+"n=espelosin+agesta&p=pedro"]]},
+ josepha_arr:{n:"María Josepha",a:"Arrechea Agesta",b:"25 abr 1693",bp:"Sumbilla",d:"24 feb 1741",c:"arbol",note:"Bautismo ark H6P9-VLW2.",src:[["Geneanet carjane3",G3+"n=arrechea+agesta&p=maria+josepha"]]},
+ joseph_ugarte:{n:"Joseph",a:"Ugarte Topalda",c:"arbol",note:"Matrimonio 3 feb 1723, Sumbilla (ark C9VG-5KMM). Sin bautismo.",src:[["Geneanet carjane3",G3+"n=ugarte+topalda&p=joseph"]]},
+ joana_beret:{n:"Joana María",a:"Bereterrechea Balentena",b:"6 jul 1695",bp:"Arantza",c:"arbol",note:"Bautismo ark H6K3-LFT2.",src:[["Geneanet carjane3",G3+"n=bereterrechea+balentena&p=joana+maria"]]},
+ joan_beret:{n:"Joan",a:"Beretarrechia Zubiria",b:"27 feb 1667",bp:"Sumbilla",c:"arbol",note:"Matrimonio 3 dic 1693, Sumbilla (ark C9K7-ZX6Z, \"Juan de Vereterechea\").",src:[["Geneanet carjane3",G3+"n=beretarrechia+zubiria&p=joan"]]},
+ balentena:{n:"María Francisca",a:"Balentena Almandoz",b:"4 mar 1669",bp:"Sumbilla",c:"arbol",note:"Bautismo ark H6P4-7TN2. Hija de Pedro Balentena (matrimonio 1658, ark F5ZK-238) y María Gerónima Almandoz.",src:[["Geneanet carjane3",G3+"n=balentena+almandoz&p=maria+francisca"]]},
+ jf_esp:{n:"Juan Francisco",a:"Espelosín Arrechea",b:"13 set 1722",bp:"Sumbilla",c:"arbol",note:"Bautismo ark H6GR-SLN2; matrimonio 2 feb 1755, Sumbilla (ark C9KM-BWN2).",src:[["Geneanet carjane3",G3+"n=espelosin+arrechea&p=juan+francisco"]]},
+ ana_huarte:{n:"Ana María",a:"Huarte Beratarrechea",b:"1 oct 1724",bp:"Sumbilla",c:"arbol",note:"Bautismo ark H6GR-SGT2. Grafías Huarte / Ugarte / Hugarte.",src:[["Geneanet carjane3",G3+"n=huarte+beratarrechea&p=ana+maria"]]},
+ jg_irig:{n:"Juan Gerónimo",a:"Irigoyen Zunda",c:"hip",note:"Sin fechas en carjane3. carmen2024 lo casa en 1738 con Juana María Ibarra, pero ella fue bautizada en set 1738 y ese árbol no lista a María Lorenza entre sus hijos: la filiación está sin resolver.",src:[["Geneanet carjane3",G3+"n=irigoyen+zunda&p=juan+geronimo"],["Geneanet carmen2024",G2+"n=yrigoyen+zunda&p=juan+geronimo"]]},
+ jm_ibarra:{n:"Juana María",a:"Ibarra Ezpeleta",b:"7 set 1738",bp:"Sumbilla",c:"hip",note:"Bautismo ark H6GT-LL2M. Hija de Tiburcio Ibarra Irurueta (n. 1704) y María Francisca Ezpeleta Lastiri (baut. 1708). Su vínculo como madre de María Lorenza solo está en carjane3.",src:[["Geneanet carmen2024",G2+"n=ibarra+ezpeleta&p=juana+maria"]]},
+ joseph_manuel:{n:"Joseph Manuel",a:"Espelosín Huarte",b:"31 mar 1763",bp:"Sumbilla",c:"arbol",note:"Bautismo en San Tiburcio y San Juan Bautista, Sumbilla (ark H6PW-61T2). Hermanos: María Salbadora (1755), Paula Francisca (1757), Ana Rafaela y Rafael Antonio (1760), María Josepha (1767), Juan Joseph (1772).",src:[["Geneanet carjane3",G3+"n=espelosin+hugarte&p=joseph+manuel"],["Geneanet carmen2024",G2+"n=espelosin+huarte&oc=1&p=joseph+manuel"]]},
+ lorenza:{n:"María Lorenza",a:"Irigoyen Ibarra",b:"22 set 1763",bp:"Sumbilla",c:"arbol",note:"Bautismo ark H6P9-P2MM.",src:[["Geneanet carjane3",G3+"n=irigoyen+ibarra&p=maria+lorenza"]]},
+ jose_antonio:{n:"José Antonio",a:"Espelosín Irigoyen",b:"11 mar 1803",bp:"Sumbilla, Navarra",d:"",c:"arbol",role:"",
+  note:"Bautizado el 12 mar 1803 en San Tiburcio y San Juan Bautista (ark H6PW-423Z). Primer matrimonio 8 oct 1832 con María Francisca Ezpeleta Jorajuria (ark C9KH-Q76Z): hijos Juan Francisco (1836) y Juana Tiburcia (1840). Segundo matrimonio 24 nov 1845, Sumbilla, con Francisca Dorotea Goñi (ark C9V2-NNMM): Fermina (1847), Juan Bautista (1849), María Bautista (1851-1903), Juana Francisca (1854), Juana Pabla (1857), Josefa Francisca (1859), Juana Matiasa (1863).",
+  src:[["Geneanet carjane3",G3+"n=espelosin+irigoyen&p=josef+antonio"],["Geneanet carmen2024",G2+"n=espelosin+yrigoyen&p=jose+antonio"]]},
+ dorotea:{n:"Francisca Dorotea",a:"Goñi Lecuna",b:"6 feb 1819",bp:"Cenoz (Ulzama), Navarra",d:"",c:"arbol",
+  note:"Bautizada el 7 feb 1819 en Ntra. Sra. de la Asunción de Cenoz (ark HDCG-19W2). Hija de Joaquín Goñi de Alberro y Estefanía Lecuna de Alcega, de los que solo hay nombres.",
+  warn:"Los árboles escriben \"Zenotz, Enériz\"; Cenoz está en el valle de Ulzama, no en Enériz. Verificar en la partida.",
+  src:[["Geneanet carjane3",G3+"n=goni+lecuna&p=francisca+dorotea"],["Geneanet carmen2024",G2+"n=goni+lecuna&p=francisca+dorotea"]]},
+ joaquin_goni:{n:"Joaquín",a:"Goñi de Alberro",c:"hip",note:"Solo nombre.",src:[["Geneanet carjane3",G3+"n=goni+de+alberro&p=joaquin"]]},
+ estefania_lecuna:{n:"Estefanía",a:"Lecuna de Alcega",c:"hip",note:"Solo nombre.",src:[["Geneanet carjane3",G3+"n=lecuna+de+alcega&p=estefania"]]},
+ bautista:{n:"María Bautista",a:"Espelosín Goñi",b:"1851",d:"1903",bp:"Sumbilla",c:"arbol",role:"hermana de Fermina",
+  note:"Casada el 10 ago 1872 con Pierre Achigar Musculdoy (n. 1839, Camou-Cihigue, Soule) en la iglesia Inmaculada Concepción de Paso Molino, Montevideo.",
+  src:[["Geneanet carmen2024",G2+"n=espelosin+goni&p=maria+bautista"]]},
+ achigar:{n:"Pierre",a:"Achigar Musculdoy",b:"1839",bp:"Camou-Cihigue, Soule",c:"arbol",src:[["Geneanet carmen2024",G2+"n=achigar+musculdoy&p=pierre"]]},
+
+ /* ===== Pedro & Fermina ===== */
+ fermina:{n:"María Fermina",a:"Espelosín Goñi",b:"4 jul 1847",bp:"Sumbilla, Navarra",d:"set 1924",dp:"Montevideo",c:"doc",role:"bisabuela de Juan Francisco",
+  note:"Bautizada el 5 jul 1847 en Sumbilla. Registrada como \"Fermina Espelosín de Garicoitz, española, 77 años, viuda, Avenida Garibaldi 522\" en el listado de defunciones de la Dirección de Cementerios (16 set 1924). Casada con Pedro hacia 1870 en Uruguay (estimado por el nacimiento del primer hijo en 1869).",
+  src:[["Diario Oficial, 17 set 1924, carilla 7 (defunción)","https://www.impo.com.uy/diariooficial/1924/09/17/7"],["Geneanet carjane3",G3+"n=espelosin+goni&p=maria+fermina"],["Wikipedia: Fermín Garicoits","https://es.wikipedia.org/wiki/Ferm%C3%ADn_Garicoits"]]},
+ pedro:{n:"Pedro (Pierre)",a:"Garicoits",b:"c. 1837",bp:"Gotein-Libarrenx, Soule (probable)",d:"31 may 1918",dp:"Montevideo",c:"doc",role:"bisabuelo de Juan Francisco · francés",
+  note:"Registrado como \"Pedro Garicoits, francés, 81 años, casado, Juan D. Jackson 1259\" en el listado de defunciones de la Administración y Receptoría General de Cementerios del 31 may 1918. Se estableció primero en Paysandú (hijos 1869-1886) y desde ~1886 en Villa del Cerro, Montevideo. El \"Pédrito Garicoix\" del anuncio de 1883 es casi seguro él.",
+  warn:"Los árboles públicos le daban nacimiento en \"Poitière, Creuse\": no existe esa comuna. El origen en Gotein-Libarrenx (Soule) es una identificación muy probable pendiente del acta de nacimiento en los archivos de Pyrénées-Atlantiques. Otro árbol (ruspill) lo hace nieto de la familia de San Miguel Garicoits de Hosta: sin sustento.",
+  src:[["Diario Oficial, 1 jun 1918, carilla 8 (defunción, verificado por OCR)","https://www.impo.com.uy/diariooficial/1918/06/01/8"],["L'Indépendant des Basses-Pyrénées, 14 set 1883 (Gallica)","https://gallica.bnf.fr/ark:/12148/bpt6k52643346/f4"],["Geneanet carjane3",G3+"n=garicoits+lahunsagoitz&p=pierre"],["Archives 64 — Gotein-Libarrenx, estado civil","https://earchives.le64.fr/archives-en-ligne/ead.html?id=FRAD064003_IR0002&c=FRAD064003_IR0002_G696"]]},
+
+ /* ===== descendencia ===== */
+ pablo:{n:"Pablo",a:"Garicoits Espelosín",b:"1869",bp:"Paysandú",d:"1936",dp:"Montevideo",c:"arbol",note:"Casado con Dolores Muñiz Belo (1874-1912).",src:[["Geneanet carmen2024",G2+"n=garicoits+espelosin&p=pablo"]]},
+ muniz:{n:"Dolores",a:"Muñiz Belo",b:"1874",d:"1912",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=pablo"]]},
+ pablo_k1:{n:"Pedro",a:"Garicoits Muñiz",b:"1892",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=pablo"]]},
+ pablo_k2:{n:"Mauricia Fermina",a:"Garicoits Muñiz",b:"1895",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=pablo"]]},
+ pablo_k3:{n:"Edelia",a:"Garicoits Muñiz",b:"1897",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=pablo"]]},
+ pablo_k4:{n:"Rómulo",a:"Garicoits Muñiz",b:"1899",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=pablo"]]},
+ jbautista:{n:"Juan Bautista",a:"Garicoits Espelosín",b:"5 feb 1873",bp:"Paysandú",d:"1956 ó 1976",dp:"Montevideo",c:"arbol",note:"Casado con Mariana Yrigaray Escaray (1878-1946). Sus hijos fueron bautizados en Ntra. Sra. del Rosario, Villa del Cerro.",warn:"Dos árboles dan fechas de muerte distintas (1956 en carmen2024, 1976 en carjane3).",src:[["Geneanet carmen2024",G2+"n=garicoits+espelosin&p=juan+bautista"],["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juan+bautista"]]},
+ yrigaray:{n:"Mariana",a:"Yrigaray Escaray",b:"1878",d:"1946",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+irigaray&p=jorge+david+mariano"]]},
+ jb_k1:{n:"Juan Bernardo Quintín",a:"Garicoits Irigaray",b:"1901",d:"1971",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juan+bautista"]]},
+ jb_k2:{n:"Juan Pedro Isaac",a:"Garicoits Irigaray",b:"1905",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juan+bautista"]]},
+ jb_k3:{n:"Jorge David Mariano",a:"Garicoits Irigaray",b:"1906",d:"1925",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+irigaray&p=jorge+david+mariano"]]},
+ jb_k4:{n:"Mauricia Fermina",a:"Garicoits Irigaray",b:"1908",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juan+bautista"]]},
+ jb_k5:{n:"Juan Carlos",a:"Garicoits Irigaray",b:"7 may 1911",d:"1990",c:"arbol",note:"Casado con Alba Pura Vázquez Álvarez.",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juan+bautista"]]},
+ jb_k6:{n:"Héctor Rodolfo",a:"Garicoits Irigaray",b:"1914",d:"1997",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juan+bautista"]]},
+ francisco:{n:"Francisco (Graciano)",a:"Garicoits Espelosín",b:"1874",bp:"Uruguay",d:"4 ene 1914",dp:"Montevideo",c:"arbol",role:"abuelo de Miguel Ángel · oriental",
+  note:"Confirmado en el registro civil uruguayo: defunción inscrita el 4 de enero de 1914 en Montevideo, nacido en 1874, hijo de Pedro Garicoits y Fermina Espelosín, casado con Felicia Imaz. Murió a los 40 años. El segundo nombre \"Graciano\" que recordaba la familia también quedó confirmado: así lo nombra el acta de nacimiento de su hijo Juan Francisco.",
+  note2:"Confirmado en FamilySearch: el acta de nacimiento de su hijo Juan Francisco (1901) lo nombra \"Francisco Graciano Garicoits Espelosin\", y su defunción está registrada el 4 de enero de 1914 en Montevideo, con 1874 como año de nacimiento y sus padres Pedro Garicoits y Fermina Espelosín. El segundo nombre que la familia recordaba era correcto.",
+  src:[["Acta de matrimonio Garicoits–Reboredo, La Paz, 1 set 1951 (aportada por Juan)",""],["Geneanet carjane3",G3+"n=garicoits+espelosin&p=francisco"],["Geneanet marrechea","https://gw.geneanet.org/marrechea?lang=es&n=garicoits+espelosin&p=francisco"]]},
+ felicia:{n:"Felicia",a:"Imaz Muñoa",b:"",bp:"Villa del Cerro, Montevideo",d:"1936",dp:"Montevideo",c:"doc",role:"abuela de Miguel Ángel · oriental",
+  note:"Durante toda la investigación fue un muro: ningún árbol público daba sus padres. Los registros civiles uruguayos la nombran con segundo apellido en las actas de sus hijos — Imaz Munoa, Imaz Munra, Imaz Muñoz — y un registro parroquial del bautismo de su hijo Roberto la da como hija de Juan Imaz y María Simona Muñoa. Murió en 1936, no \"antes de 1951\" como decía el acta de matrimonio de su hijo.",
+  src:[["Acta de matrimonio 1951 (aportada por Juan)",""],["FamilySearch — Uruguay, Registro Civil: defunción 1936 y actas de sus hijos","https://www.familysearch.org/search/record/results?q.givenName=Felicia&q.surname=Imaz&f.recordCountry=Uruguay"],["FamilySearch — Uruguay, Catholic Church Records: sus padres","https://www.familysearch.org/search/record/results?q.surname=Imaz%20Munoa&f.recordCountry=Uruguay"]]},
+ bernardo:{n:"Bernardo",a:"Garicoits Espelosín",b:"c. 1878",bp:"Paysandú",d:"mar 1966",dp:"Montevideo",c:"arbol",note:"Casado con Sulema Alzueta.",src:[["Geneanet carmen2024",G2+"n=garicoits+espelosin&p=bernardo"],["Geneanet carjane3",G3+"n=garicoits+espelosin&p=bernardo"]]},
+ alzueta:{n:"Sulema",a:"Alzueta",c:"arbol",src:[["Geneanet carmen2024",G2+"n=garicoits+espelosin&p=bernardo"]]},
+ be_k1:{n:"Mariana Justa",a:"Garicoits Alzueta",b:"1906",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=bernardo"]]},
+ be_k2:{n:"Bernardo Enrique Aniceto",a:"Garicoits Alzueta",b:"1909",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=bernardo"]]},
+ be_k3:{n:"María Virginia",a:"Garicoits Alzueta",b:"1912",d:"1915",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=bernardo"]]},
+ be_k4:{n:"Julieta Yenen",a:"Garicoits Alzueta",b:"1923",d:"1924",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=bernardo"]]},
+ be_k5:{n:"Rosa Elena",a:"Garicoits Alzueta",b:"1924",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=bernardo"]]},
+ be_k6:{n:"Beatriz",a:"Garicoits Alzueta",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=bernardo"]]},
+ pedrof:{n:"Pedro Francisco",a:"Garicoits Espelosín",b:"c. 1882",d:"1931",dp:"Montevideo",c:"doc",note:"Era el hijo más dudoso de la lista —solo aparecía en dos árboles sin fuente— y el registro civil uruguayo lo confirma: casado con Isabel (Ysabel) Gadea, con hijos Washington, Edmundo, Luzemburgo y Soledad Garicoits Gadea. Su defunción figura inscrita en Montevideo en 1931.",src:[["Geneanet carmen2024",G2+"n=garicoits+lahunsangoitz&p=pierre"]]},
+ polonio:{n:"Polonio",a:"Garicoits Espelosín",b:"9 feb 1886",bp:"Paysandú",d:"4 set 1952",dp:"Montevideo",c:"arbol",role:"farmacéutico · diputado por Rocha",
+  note:"Farmacéutico en Rocha y diputado herrerista. Casado con Blanca Esther Pérez Herrera (n. 1893).",
+  src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=polonio"],["Revista Histórica Rochense","https://www.revistahistoricarochense.com.uy/rhr-no-7/historia-del-estadio-municipal-dr-mario-sobrero/"],["Geni","https://www.geni.com/people/Polonio-Garico%C3%AFts-Espelos%C3%ADn/6000000049132872821"]]},
+ perezh:{n:"Blanca Esther",a:"Pérez Herrera",b:"1893",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=polonio"]]},
+ po_k1:{n:"Julio César",a:"Garicoits Pérez",b:"1914",c:"arbol",note:"Casado con Milka Raquel Píriz Gutiérrez.",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=polonio"]]},
+ po_k2:{n:"Ana Blanca Esther",a:"Garicoits Pérez",b:"1918",d:"1933",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=polonio"]]},
+ po_k3:{n:"Raquel",a:"Garicoits Pérez",b:"1923",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=polonio"]]},
+ juana:{n:"Juana",a:"Garicoits Espelosín",b:"c. 1887",c:"arbol",note:"Casada el 28 oct 1915 con Lino Marquizo Silva (acta en FamilySearch ark 1:1:6F66-NRMQ).",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juana"]]},
+ marquizo:{n:"Lino",a:"Marquizo Silva",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juana"]]},
+ ju_k1:{n:"Ricardo Alberto",a:"Marquizo Garicoits",b:"1916",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juana"]]},
+ ju_k2:{n:"Alba Lidia",a:"Marquizo Garicoits",b:"1917",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juana"]]},
+ ju_k3:{n:"Ernesto Polonio",a:"Marquizo Garicoits",b:"1918",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juana"]]},
+ ju_k4:{n:"María Élida",a:"Marquizo Garicoits",b:"1921",c:"arbol",note:"Profesora de música en Rocha.",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juana"]]},
+ ju_k5:{n:"Lino Ángel",a:"Marquizo Garicoits",b:"1924",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=juana"]]},
+ fermin:{n:"Fermín",a:"Garicoits Espelosín",b:"1 oct 1888",bp:"Villa del Cerro, Montevideo",d:"10 jul 1964",dp:"Montevideo",c:"doc",role:"juez · ministro del Tribunal de lo Contencioso Administrativo",
+  note:"Nacimiento: acta 245, 13ª sección, 1888 (FamilySearch ark 1:1:VR4J-GBH). Edicto matrimonial con María del Carmen Gómez Castellá en el Diario Oficial del 20 abr 1922. Defunción en 18 de Julio 1417 ap. 6 (Diario Oficial 23 jul 1964). Tiene artículo en Wikipedia.",
+  src:[["Wikipedia: Fermín Garicoits","https://es.wikipedia.org/wiki/Ferm%C3%ADn_Garicoits"],["Diario Oficial, 20 abr 1922, c. 34 (edicto)","https://www.impo.com.uy/diariooficial/1922/04/20/34"],["Diario Oficial, 23 jul 1964, c. 8 (defunción)","https://www.impo.com.uy/diariooficial/1964/07/23/8"]]},
+ gomezc:{n:"María del Carmen",a:"Gómez Castellá",c:"doc",src:[["Diario Oficial, 20 abr 1922, c. 34","https://www.impo.com.uy/diariooficial/1922/04/20/34"]]},
+ fe_k1:{n:"Fermín Juan",a:"Garicoits Gómez",b:"1923",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=fermin"]]},
+ fe_k2:{n:"Luis Eduardo",a:"Garicoits Gómez",b:"1924",c:"arbol",note:"Casado con María Teresa Quagliotti Ameglio.",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=fermin"]]},
+ fe_k3:{n:"María del Carmen Hilda",a:"Garicoits Gómez",b:"1926",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+espelosin&p=fermin"]]},
+ mariana:{n:"Mariana",a:"Garicoits Espelosín",b:"1894",bp:"Paysandú",c:"hip",note:"Aparece solo en augustafernandez / carmen2024. Fermina tendría 47 años; posible hija tardía o error.",src:[["Geneanet carmen2024",G2+"n=garicoits+lahunsangoitz&p=pierre"]]},
+ jfrancisco:{n:"Juan Francisco",a:"Garicoits Imaz",b:"22 feb 1901",bp:"Montevideo",d:"",c:"doc",role:"abuelo de Juan Pablo · oriental · empleado",
+  note:"Nacido el 22 feb 1901 e inscrito el 2 de marzo en Villa del Cerro, Montevideo, hijo de Francisco Graciano Garicoits Espelosín y Felicia Imaz. Acta de matrimonio n.º 79, Registro de Estado Civil, 5ª sección de Canelones, La Paz, 1 set 1951, 11:15, ante Mario A. Ardoino. Domiciliado en La Paz. Testigos: Demetrio Martínez (51, comerciante, Montevideo) y su hermana María Celia Garicoits de Gorlero.",
+  src:[["Acta de matrimonio Garicoits–Reboredo, La Paz, 1 set 1951 (aportada por Juan)",""],["Geneanet carjane3",G3+"n=garicoits+imaz&p=juan+francisco"]]},
+ dolores:{n:"Dolores Filonila",a:"Reboredo Lamas",b:"14 dic 1913",bp:"República Argentina (ciudad sin precisar)",d:"",c:"doc",role:"abuela de Juan Pablo · argentina · \"labores\"",
+  note:"El bautismo de su hermano Manuel en 1916 sitúa a la familia en la parroquia de San Telmo, Buenos Aires: allí debería estar su propia partida. Todo lo demás viene del acta de 1951: nacida el 14 dic 1913 en \"la República Argentina\" — el acta no dice en qué ciudad —, de profesión labores, domiciliada en La Paz (Canelones), hija de Manuel Reboredo y Filonila Lamas, ambos españoles y ya fallecidos. Se casó a los 37 años. No existe ni un registro público en línea de ella ni de sus padres: se buscó en Geneanet, Geni, MyHeritage, FamilySearch público y el Diario Oficial uruguayo.",
+  warn:"Su hermano mayor Isauro nació en Lugo en 1908 y ella en Argentina en 1913: la familia emigró entre esas dos fechas. Hipótesis principal: nació en la Ciudad de Buenos Aires o el Gran Buenos Aires, donde se concentraba la colectividad gallega en 1913. La segunda: en el litoral (Entre Ríos, Santa Fe), zona de paso hacia Uruguay. Nada lo prueba todavía.",
+  src:[["Acta de matrimonio n.º 79, La Paz, Canelones, 1 set 1951 (aportada por Juan)",""],["FamilySearch — Registro Civil de Buenos Aires 1811-1980 (búsqueda pre-armada)","https://www.familysearch.org/search/record/results?q.surname=Reboredo&q.givenName=Dolores&q.birthLikeDate.from=1913&q.birthLikeDate.to=1914&f.collectionId=5000077"],["Registro Civil CABA — partidas sin tomo ni acta","https://buenosaires.gob.ar/tramites/solicitud-partidas"]]},
+ isauro:{n:"Isauro",a:"Reboredo Lamas",b:"1908",bp:"Outeiro de Rei, Lugo",c:"doc",role:"hermano mayor de Dolores",
+  note:"Aparece en la relación de mozos declarados prófugos del reemplazo de 1929, Ayuntamiento de Otero de Rey (hoy Outeiro de Rei, Lugo): \"64. Isauro Reboredo Lamas, de Manuel y Filomena, en Buenos Aires\". Por la Ley de Reclutamiento de 1912, el reemplazo de 1929 alistaba a los nacidos en 1908 — lo confirma la prensa gallega de enero de 1929. Nació en España y no se presentó al alistamiento porque la familia ya vivía en Buenos Aires. Es la primera prueba documental de esta rama y la que fija la ventana de emigración: entre 1908 y 1913.",
+  warn:"La entrada es auténtica: la verifiqué sobre la imagen original, incluida la cabecera del ayuntamiento. Que Isauro sea hermano de Dolores es una identificación por convergencia — Reboredo + Lamas + un padre Manuel + una madre Filomena + residencia en Buenos Aires + cronología compatible —, no una prueba. Se confirmaría con su bautismo de 1908.",
+  src:[["Boletín Oficial de la Provincia de Lugo, n.º 147, 26 jun 1929, p. 1 (verificado sobre la imagen)","https://biblioteca.galiciana.gal/es/consulta/registro.do?id=10000347973"],["Imagen de la página","https://biblioteca.galiciana.gal/es/catalogo_imagenes/grupo.do?path=1370337&idImagen=13325788"],["Ley de Reclutamiento de 27 feb 1912, art. 32","https://www.omniamutantur.es/wp-content/uploads/LEGISLACI%C3%93N-1910-1912.pdf"]]},
+ manuel_r:{n:"Manuel",a:"Reboredo",bp:"Outeiro de Rei, Lugo (probable)",d:"antes de 1951",c:"doc",role:"español · bisabuelo de Juan Pablo",
+  note:"El Boletín Oficial de Lugo de 1929 lo nombra como padre de Isauro, mozo del Ayuntamiento de Otero de Rey residente en Buenos Aires. Eso sitúa a la familia en Outeiro de Rei (Lugo) y en Buenos Aires, y acota la emigración a 1908-1913. No figura en ninguna lista de prófugos: emigró ya casado y con unos treinta años, fuera de la edad de quintas, lo que explica que no dejara expediente militar.",
+  warn:"Dos avisos. El origen en Outeiro de Rei depende de que Isauro sea de esta familia. Y corrige una conclusión anterior: el análisis de apellidos apuntaba a la comarca de Deza (Pontevedra), y el documento apunta a Lugo. La estadística de apellidos orientó mal; conviene no volver a usarla como guía aquí.",
+  src:[["Acta de matrimonio 1951 (aportada por Juan)",""],["Boletín Oficial de la Provincia de Lugo, 26 jun 1929, p. 1","https://biblioteca.galiciana.gal/es/consulta/registro.do?id=10000347973"],["Parroquias de Outeiro de Rei","https://outeiroderei.gal/es/conocenos/situacion-y-division-parroquial/"]]},
+ filonila:{n:"Filonila (Filomena)",a:"Lamas",bp:"Outeiro de Rei, Lugo (probable)",d:"antes de 1951",c:"doc",role:"española · bisabuela de Juan Pablo",
+  note:"El acta uruguaya de 1951 la llama Filonila; el Boletín Oficial de Lugo de 1929 la llama Filomena. Casi con certeza se llamaba Filomena —nombre comunísimo en Galicia— y \"Filonila\" es una deformación introducida en Argentina o en el acta uruguaya. Su nieta heredó la versión deformada: Dolores Filonila.",
+  warn:"Esto desmonta una hipótesis anterior. Se había investigado \"Filonila\" como nombre propio y, al no existir en Galicia y sí en Burgos, Palencia, Valladolid y Cantabria, se llegó a suponer que ella era castellano-leonesa y que el matrimonio se había formado en Buenos Aires entre gente de regiones distintas. El documento de 1929 la devuelve a Galicia. Buen recordatorio de lo frágil que es razonar por estadística de nombres.",
+  src:[["Acta de matrimonio 1951 (aportada por Juan)",""],["Boletín Oficial de la Provincia de Lugo, 26 jun 1929, p. 1","https://biblioteca.galiciana.gal/es/consulta/registro.do?id=10000347973"]]},
+ ricardo:{n:"Ricardo Orlando",a:"Garicoits Imaz",b:"1903",bp:"Montevideo",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+imaz&p=ricardo+orlando"]]},
+ tulio:{n:"Tulio Antonio",a:"Garicoits Imaz",b:"1904",bp:"Montevideo",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+imaz&p=tulio+antonio"]]},
+ miguel_imaz:{n:"Miguel Ángel",a:"Garicoits Imaz",b:"8 may 1906",bp:"Montevideo",c:"arbol",note:"Tarjeta de inmigración a Brasil, Río de Janeiro, 10 abr 1946 (misma fecha que su hermana María Celia). Tío homónimo del padre de Juan Pablo.",src:[["Geneanet carjane3",G3+"n=garicoits+imaz&p=miguel+angel"]]},
+ roberto:{n:"Roberto",a:"Garicoits Imaz",b:"1907",bp:"Montevideo",c:"arbol",note:"Acta en FamilySearch ark 1:1:QG3J-KQ5N.",src:[["Geneanet carjane3",G3+"n=garicoits+imaz&p=roberto"]]},
+ feliciam:{n:"Felicia María",a:"Garicoits Imaz",b:"1909",bp:"Montevideo",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+imaz&p=felicia+maria"]]},
+ mcelia:{n:"María Celia",a:"Garicoits Imaz",b:"26 set 1910",bp:"Montevideo",c:"doc",role:"testigo en la boda de 1951",
+  note:"Testigo en el matrimonio de su hermano (1951): \"María Celia Garicoits de Gorlero, oriental, 36 años, casada, labores, Montevideo\" — la edad declarada no cuadra con 1910 (tendría 40). Casada el 12 abr 1941 con Roberto Gorlero Bacigalupi (n. 1913, escribano). Tarjeta de inmigración a Brasil, 10 abr 1946.",
+  src:[["Acta de matrimonio 1951 (aportada por Juan)",""],["Geneanet carjane3",G3+"n=garicoits+imaz&p=maria+celia"],["Geneanet magorr (descendencia)","https://gw.geneanet.org/magorr?lang=es&n=gorlero+garicoits&p=maria+celia"]]},
+ gorlero:{n:"Roberto",a:"Gorlero Bacigalupi",b:"1913",c:"arbol",note:"Escribano. Hijo de Bartolomé Gorlero Tissoni y Amalia Bacigalupi Odicini.",src:[["Geneanet carjane3",G3+"n=gorlero+bacigalupi&p=roberto"]]},
+ mc_k1:{n:"María Celia",a:"Gorlero Garicoits",c:"arbol",note:"Casada con Oscar Santa Cruz Rodríguez Barrios; hijos María Alejandra y Gustavo Daniel Rodríguez Gorlero.",src:[["Geneanet magorr","https://gw.geneanet.org/magorr?lang=es&n=gorlero+garicoits&p=maria+celia"]]},
+ luisa:{n:"Luis Alberto",a:"Garicoits Imaz",b:"1912",bp:"Montevideo",c:"arbol",src:[["Geneanet carjane3",G3+"n=garicoits+imaz&p=luis+alberto"]]},
+ miguel:{n:"Miguel Ángel",a:"Garicoïts Reboredo",c:"fam",role:"padre de Juan Pablo",note:"Dato aportado por Juan. Sin fechas todavía. Registrado con diéresis (Garicoïts): es la grafía francesa del apellido (el tréma evita que \"oi\" se lea /wa/); ningún documento uruguayo de la familia entre 1888 y 1951 la usa, así que entró en la rama en el siglo XX.",src:[["Dato de familia (Juan Pablo Garicoits)",""]]},
+ adriana:{n:"Adriana María",a:"Lasa Garrido",c:"fam",role:"madre de Juan Pablo",note:"Dato aportado por Juan. Línea materna fuera del alcance de esta versión.",src:[["Dato de familia",""]]},
+ juanpablo:{n:"Juan Pablo",a:"Garicoïts Lasa",c:"fam",role:"",note:"Registrado como Garicoïts, igual que su padre.",src:[["Dato de familia",""]]},
+ ariel:{n:"Ariel Alejandro",a:"Garicoïts Lasa",c:"fam",role:"hermano de Juan Pablo",note:"Dato aportado por Juan.",src:[["Dato de familia",""]]},
+ macarena:{n:"María Macarena",a:"Garicoïts Lasa",c:"fam",role:"hermana de Juan Pablo",note:"Dato aportado por Juan.",src:[["Dato de familia",""]]},
+};
+
+/* ancestor charts: couple node = {p: father, s: mother, k:[couples of parents], of: "p"|"s" = whose parents} */
+const A_PEDRO = {p:"bernard1804",s:"marie_lah",k:[
+  {of:"p",p:"bernard1780",s:"etchecopar",k:[{of:"p",p:"salaber",s:"iritcity"},{of:"s",p:"dominique_etch",s:"cadette_etch"}]},
+  {of:"s",p:"pierre_lah",s:"jaureguiberry"}
+]};
+const A_DOLORES = {p:"manuel_r",s:"filonila",k:[]};
+const A_FERMINA = {p:"jose_antonio",s:"dorotea",k:[
+  {of:"p",p:"joseph_manuel",s:"lorenza",k:[
+    {of:"p",p:"jf_esp",s:"ana_huarte",k:[
+      {of:"p",p:"pedro_agesta",s:"josepha_arr",k:[
+        {of:"p",p:"andres",s:"maria_agesta_ub",k:[{of:"p",p:"pedro_apez",s:"mariana_ag"}]},
+        {of:"s",p:"martin_arr",s:"maria_agesta_zoz",k:[{of:"p",p:"jacobe",s:"anna_aranibar"}]}]},
+      {of:"s",p:"joseph_ugarte",s:"joana_beret",k:[{of:"s",p:"joan_beret",s:"balentena"}]}]},
+    {of:"s",p:"jg_irig",s:"jm_ibarra"}]},
+  {of:"s",p:"joaquin_goni",s:"estefania_lecuna"}
+]};
+
+/* descendant tree from Pedro & Fermina */
+const D = {p:"fermina",s:"pedro",m:"c. 1870, Uruguay",d:1,k:[
+    {p:"pablo",s:"muniz",k:[{p:"pablo_k1"},{p:"pablo_k2"},{p:"pablo_k3"},{p:"pablo_k4"}]},
+    {p:"jbautista",s:"yrigaray",k:[{p:"jb_k1"},{p:"jb_k2"},{p:"jb_k3"},{p:"jb_k4"},{p:"jb_k5"},{p:"jb_k6"}]},
+    {p:"francisco",s:"felicia",m:"c. 1900, Montevideo",d:1,k:[
+      {p:"jfrancisco",s:"dolores",m:"1 set 1951, La Paz (Canelones)",d:1,k:[
+        {p:"miguel",s:"adriana",d:1,k:[{p:"juanpablo",d:1},{p:"ariel"},{p:"macarena"}]}
+      ]},
+      {p:"ricardo"},{p:"tulio"},{p:"miguel_imaz"},{p:"roberto"},{p:"feliciam"},
+      {p:"mcelia",s:"gorlero",m:"12 abr 1941, Montevideo",k:[{p:"mc_k1"}]},
+      {p:"luisa"}
+    ]},
+    {p:"bernardo",s:"alzueta",k:[{p:"be_k1"},{p:"be_k2"},{p:"be_k3"},{p:"be_k4"},{p:"be_k5"},{p:"be_k6"}]},
+    {p:"pedrof"},
+    {p:"polonio",s:"perezh",k:[{p:"po_k1"},{p:"po_k2"},{p:"po_k3"}]},
+    {p:"juana",s:"marquizo",m:"28 oct 1915",k:[{p:"ju_k1"},{p:"ju_k2"},{p:"ju_k3"},{p:"ju_k4"},{p:"ju_k5"}]},
+    {p:"fermin",s:"gomezc",m:"1922",k:[{p:"fe_k1"},{p:"fe_k2"},{p:"fe_k3"}]},
+    {p:"mariana"}
+]};
+const MARRIED_IN_ANC = {
+  dolores:{cap:"padres de ella",of:["manuel_r","filonila"],sibs:["isauro","manuel_rl"],sibcap:"hermanos"},
+  felicia:{cap:"padres de ella",of:["juan_imaz","simona_munoa"],
+           gp:[{cap:"padres de Juan Imaz",of:["geronimo_imaz","ana_gorostide"]},
+               {cap:"padres de María Simona",of:["miguel_munoa","manuela_iraola"]}]}
+};
+const EXTRA_KIDS = {jose_antonio:[{p:"bautista",s:"achigar"}]}; // shown in panel only
+
+/* ---- relationship maps ---- */
+const parentsOf={}, childrenOf={}, spouseOf={}, marriageOf={}, GEN={};
+const addChild=(par,ch)=>{(childrenOf[par]=childrenOf[par]||[]).push(ch);};
+function walkD(n,g){GEN[n.p]=g; if(n.s){GEN[n.s]=g; spouseOf[n.p]=n.s; spouseOf[n.s]=n.p; marriageOf[n.p]=marriageOf[n.s]=n.m||"";}
+  (n.k||[]).forEach(c=>{parentsOf[c.p]=[n.p,n.s].filter(Boolean); addChild(n.p,c.p); if(n.s)addChild(n.s,c.p); walkD(c,g-1);});}
+function walkA(n,g){GEN[n.p]=GEN[n.s]=g; spouseOf[n.p]=n.s; spouseOf[n.s]=n.p;
+  (n.k||[]).forEach(c=>{const child=c.of==="s"?n.s:n.p; parentsOf[child]=[c.p,c.s]; addChild(c.p,child); addChild(c.s,child); walkA(c,g+1);});}
+walkD(D,4); walkA(A_PEDRO,5); walkA(A_FERMINA,5);
+parentsOf.pedro=["bernard1804","marie_lah"]; addChild("bernard1804","pedro"); addChild("marie_lah","pedro");
+parentsOf.fermina=["jose_antonio","dorotea"]; addChild("jose_antonio","fermina"); addChild("dorotea","fermina");
+parentsOf.dolores=["manuel_r","filonila"]; addChild("manuel_r","dolores"); addChild("filonila","dolores"); spouseOf.manuel_r="filonila"; spouseOf.filonila="manuel_r"; GEN.manuel_r=GEN.filonila=3;
+parentsOf.felicia=["juan_imaz","simona_munoa"]; addChild("juan_imaz","felicia"); addChild("simona_munoa","felicia");
+spouseOf.juan_imaz="simona_munoa"; spouseOf.simona_munoa="juan_imaz"; GEN.juan_imaz=GEN.simona_munoa=GEN.felicia+1;
+parentsOf.juan_imaz=["geronimo_imaz","ana_gorostide"]; addChild("geronimo_imaz","juan_imaz"); addChild("ana_gorostide","juan_imaz");
+spouseOf.geronimo_imaz="ana_gorostide"; spouseOf.ana_gorostide="geronimo_imaz"; GEN.geronimo_imaz=GEN.ana_gorostide=GEN.felicia+2;
+parentsOf.simona_munoa=["miguel_munoa","manuela_iraola"]; addChild("miguel_munoa","simona_munoa"); addChild("manuela_iraola","simona_munoa");
+spouseOf.miguel_munoa="manuela_iraola"; spouseOf.manuela_iraola="miguel_munoa"; GEN.miguel_munoa=GEN.manuela_iraola=GEN.felicia+2;
+parentsOf.manuel_rl=["manuel_r","filonila"]; addChild("manuel_r","manuel_rl"); addChild("filonila","manuel_rl"); GEN.manuel_rl=GEN.dolores;
+parentsOf.isauro=["manuel_r","filonila"]; addChild("manuel_r","isauro"); addChild("filonila","isauro"); GEN.isauro=GEN.dolores;
+Object.entries(EXTRA_KIDS).forEach(([par,ks])=>ks.forEach(k=>{const sp=spouseOf[par]; parentsOf[k.p]=[par,sp].filter(Boolean); addChild(par,k.p); if(sp)addChild(sp,k.p); GEN[k.p]=GEN[par]-1; if(k.s){spouseOf[k.p]=k.s; spouseOf[k.s]=k.p; GEN[k.s]=GEN[k.p];}}));
+const GENNAME={0:"Juan Pablo",1:"padres",2:"abuelos",3:"bisabuelos",4:"tatarabuelos"};
+const genLabel=g=>g==null?"—":(GENNAME[g]||(g+".os abuelos"))+" · G"+g;
+
+/* ---- state ---- */
+const DEFAULT_OPEN=["fermina","francisco","jfrancisco","miguel","bernard1804","jose_antonio","joseph_manuel","bernard1780","anc:dolores"];
+let open=new Set(DEFAULT_OPEN), sel="pedro", scale=1;
+try{const s=JSON.parse(localStorage.getItem("garicoits-state-v2")||"null"); if(s){open=new Set(s.open); sel=s.sel||sel; scale=s.scale||1;}}catch(e){}
+function save(){try{localStorage.setItem("garicoits-state-v2",JSON.stringify({open:[...open],sel,scale}))}catch(e){}}
+
+/* ---- render ---- */
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+function dates(p){const b=p.b?"n. "+p.b:"", d=p.d?"† "+p.d:""; return [b,d].filter(Boolean).join(" · ")||(p.bp?p.bp:"");}
+function card(id,direct,variant){const p=P[id]; return `<button class="card ${variant||""} ${direct?"direct":""} ${sel===id?"sel":""}" data-id="${id}">
+  <span class="conf ${p.c}"></span><span class="gen">G${GEN[id]??"?"}</span>
+  <div class="nm">${esc(p.n)} <span class="ap">${esc(p.a)}</span></div>
+  <div class="dt">${esc(dates(p))}</div>${p.role?`<div class="role">${esc(p.role)}</div>`:""}</button>`;}
+function renderD(n){
+  const direct=!!n.d, kids=n.k||[], isOpen=open.has(n.p);
+  const anc = n.s ? MARRIED_IN_ANC[n.s] : null, ancOpen = !!(anc && open.has("anc:"+n.s));
+  const swap=!!anc;
+  let h=`<li class="${direct&&parentsOf[n.p]?"direct-edge":""}"><div class="cnode ${n.s?"":"single"} ${swap?"swap":""}">`;
+  h+=`<div class="slot-a">${card(n.p,direct)}</div>`;
+  if(n.s){
+    let a="";
+    if(anc){
+      a+=`<div class="slot-anc">`;
+      if(ancOpen){
+        (anc.gp||[]).forEach(g=>{
+          a+=`<div class="acap">${esc(g.cap)}</div>`+card(g.of[0],true)+`<div class="amar">⚭</div>`+card(g.of[1],true)+`<div class="adrop"></div>`;
+        });
+        a+=`<div class="acap"><button data-toggle="anc:${n.s}">▾ ${esc(anc.cap)}</button></div>`;
+        a+=card(anc.of[0],true)+`<div class="amar">⚭</div>`+card(anc.of[1],true)+`<div class="adrop"></div>`;
+        if(anc.sibs&&anc.sibs.length){
+          a+=`<div class="acap">${esc(anc.sibcap)}</div>`+anc.sibs.map(id=>card(id,false)).join("")+`<div class="adrop"></div>`;
+        }
+      } else {
+        a+=`<button class="ancbtn" data-toggle="anc:${n.s}">▴ ${esc(anc.cap)}</button>`;
+      }
+      a+=`</div>`;
+    }
+    h+=`<div class="slot-link"><span>⚭</span></div><div class="slot-b">${a}${card(n.s,direct)}</div>`;
+    if(n.m) h+=`<div class="slot-m">${esc(n.m)}</div>`;
+  }
+  if(kids.length) h+=`<div class="slot-k"><button class="kids ${isOpen?"open":""}" data-toggle="${n.p}">${isOpen?"▾":"▸"} ${kids.length} ${kids.length===1?"hijo":"hijos"}</button></div>`;
+  h+=`</div>`;
+  if(kids.length&&isOpen){
+    const room=kids.some(k=>k.s&&MARRIED_IN_ANC[k.s]&&open.has("anc:"+k.s));
+    const pill=!room&&kids.some(k=>k.s&&MARRIED_IN_ANC[k.s]);
+    h+=`<ul class="${kids.some(k=>k.d)?"direct-stem":""} ${room?"anc-room":pill?"anc-pill":""}">${kids.map(renderD).join("")}</ul>`;
+  }
+  return h+`</li>`;
+}
+function renderA(n){
+  const par=n.k||[], isOpen=open.has(n.p);
+  let h=`<li><div class="node">`;
+  if(par.length) h+=`<button class="kids top ${isOpen?"open":""}" data-toggle="${n.p}">${isOpen?"▾":"▴"} ${par.length===2?"padres de ambos":par[0].of==="s"?"padres de ella":"padres de él"}</button>`;
+  h+=card(n.p,false)+`<div class="marr">⚭</div><div class="sp">${card(n.s,false)}</div>`;
+  h+=`</div>`;
+  if(par.length&&isOpen) h+=`<ul>${par.map(renderA).join("")}</ul>`;
+  return h+`</li>`;
+}
+const zoomEl=document.getElementById("zoom"), canvas=document.getElementById("canvas"), panel=document.getElementById("panel");
+function draw(){
+  zoomEl.innerHTML=`
+   <div class="band"><span>Ascendencia · Soule (Francia) y Sumbilla (Navarra)</span></div>
+   <div class="couple">
+     <div class="ped"><ul class="tree up">${renderA(A_PEDRO)}</ul><div class="stem"></div><div class="node">${card("pedro",true)}</div></div>
+     <div class="heart">⚭<br>c. 1870<br>Uruguay</div>
+     <div class="ped"><ul class="tree up">${renderA(A_FERMINA)}</ul><div class="stem"></div><div class="node">${card("fermina",true)}</div></div>
+   </div>
+   <div class="down"><div class="stem"></div></div>
+   <div class="band"><span>Descendencia · Paysandú, Montevideo, La Paz</span></div>
+   <ul class="tree desc">${renderD(D)}</ul>
+`;
+  zoomEl.style.transform=`scale(${scale})`;
+  zoomEl.querySelectorAll(".slot-anc").forEach(a=>{const ul=a.closest("ul.anc-room"); if(ul) ul.style.setProperty("--ancpad",(a.offsetHeight+20)+"px");});
+  showPanel(); save();
+}
+function showPanel(){
+  const p=P[sel]; if(!p){panel.innerHTML='<div class="empty">Seleccioná a alguien del árbol.</div>';return;}
+  const labels={doc:"Documento primario",arbol:"Árboles públicos que citan actas",fam:"Dato de familia",hip:"Hipótesis / dudoso"};
+  const rel=[];
+  (parentsOf[sel]||[]).forEach(x=>rel.push(["Padre/madre",x]));
+  if(spouseOf[sel]) rel.push(["Cónyuge",spouseOf[sel]]);
+  (childrenOf[sel]||[]).forEach(x=>rel.push(["Hijo/a",x]));
+  const sib=new Set(); (parentsOf[sel]||[]).forEach(par=>(childrenOf[par]||[]).forEach(x=>{if(x!==sel)sib.add(x)})); [...sib].forEach(x=>rel.push(["Hermano/a",x]));
+  panel.innerHTML=`<div class="eyebrow">${esc(genLabel(GEN[sel]))}</div><h2>${esc(p.n)} ${esc(p.a)}</h2>
+   <span class="pill ${p.c}">${labels[p.c]}</span>
+   <dl class="kv">${p.b?`<dt>Nacimiento</dt><dd class="mono">${esc(p.b)}${p.bp?" · "+esc(p.bp):""}</dd>`:(p.bp?`<dt>Origen</dt><dd>${esc(p.bp)}</dd>`:"")}
+   ${p.d?`<dt>Defunción</dt><dd class="mono">${esc(p.d)}${p.dp?" · "+esc(p.dp):""}</dd>`:""}
+   ${marriageOf[sel]?`<dt>Matrimonio</dt><dd class="mono">${esc(marriageOf[sel])}</dd>`:""}
+   ${p.role?`<dt>Notas</dt><dd>${esc(p.role)}</dd>`:""}</dl>
+   ${p.note?`<p>${esc(p.note)}</p>`:""}${p.warn?`<div class="warn">${esc(p.warn)}</div>`:""}
+   <h3>Fuentes</h3><ul class="src">${(p.src||[]).map(([t,u])=>`<li>${u?`<a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a>`:esc(t)}</li>`).join("")||"<li>Sin fuentes</li>"}</ul>
+   ${rel.length?`<h3>Relaciones</h3><div class="rel">${rel.map(([r,id])=>`<button data-go="${id}"><span style="color:var(--ink3)">${r} · </span>${esc(P[id].n)} ${esc(P[id].a)}</button>`).join("")}</div>`:""}`;
+}
+const COUPLE_KEY={}, DESC=new Set();
+(function w(n){COUPLE_KEY[n.p]=COUPLE_KEY[n.s]=n.p; (n.k||[]).forEach(w);})(A_PEDRO); (function w(n){COUPLE_KEY[n.p]=COUPLE_KEY[n.s]=n.p; (n.k||[]).forEach(w);})(A_FERMINA);
+(function w(n){DESC.add(n.p); if(n.s)DESC.add(n.s); (n.k||[]).forEach(w);})(D);
+function reveal(id){
+  for(const [sp,a] of Object.entries(MARRIED_IN_ANC)) if(a.of.includes(id)||(a.sibs||[]).includes(id)||id===sp){open.add("anc:"+sp); if(a.of.includes(id)||(a.sibs||[]).includes(id))id=sp;}
+  if(DESC.has(id)){let cur=id, g=0; while(g++<40){const par=parentsOf[cur]; if(!par||!par.length||!DESC.has(par[0]))break; par.forEach(x=>open.add(x)); cur=par[0];} return;}
+  let c=id, g=0; while(g++<40){const ch=childrenOf[c]; if(!ch||!ch.length)break; c=ch[0]; if(c==="pedro"||c==="fermina")break; open.add(COUPLE_KEY[c]||c);}
+}
+function centerOn(id,smooth){const el=zoomEl.querySelector(`[data-id="${id}"]`); if(!el)return;
+  const cr=canvas.getBoundingClientRect(), er=el.getBoundingClientRect();
+  const x=(er.left-cr.left)+canvas.scrollLeft+er.width/2, y=(er.top-cr.top)+canvas.scrollTop;
+  canvas.scrollTo({left:x-canvas.clientWidth/2, top:Math.max(0,y-canvas.clientHeight/2+80), behavior:smooth?"smooth":"auto"});}
+document.addEventListener("click",e=>{
+  const t=e.target.closest("[data-toggle]"); if(t){const id=t.dataset.toggle; open.has(id)?open.delete(id):open.add(id); draw(); return;}
+  const c=e.target.closest("[data-id]"); if(c){sel=c.dataset.id; draw(); return;}
+  const g=e.target.closest("[data-go]"); if(g){sel=g.dataset.go; reveal(sel); draw(); centerOn(sel,true); return;}
+});
+document.getElementById("btnExpand").onclick=()=>{Object.keys(P).forEach(id=>open.add(id)); Object.keys(MARRIED_IN_ANC).forEach(id=>open.add("anc:"+id)); draw();};
+document.getElementById("btnDirect").onclick=()=>{open=new Set(DEFAULT_OPEN); draw();};
+const setScale=s=>{scale=Math.min(2,Math.max(.3,s)); zoomEl.style.transform=`scale(${scale})`; save();};
+document.getElementById("btnZoomIn").onclick=()=>setScale(scale*1.2);
+document.getElementById("btnZoomOut").onclick=()=>setScale(scale/1.2);
+document.getElementById("btnFit").onclick=()=>setScale(1);
+document.getElementById("btnTop").onclick=()=>{sel="pedro"; draw(); centerOn("pedro",true);};
+document.getElementById("btnMe").onclick=()=>{sel="juanpablo"; reveal("juanpablo"); draw(); centerOn("juanpablo",true);};
+/* ---- search ---- */
+const norm=t=>String(t||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const INDEX=Object.entries(P).map(([id,p])=>({id,hay:norm([p.n,p.a,p.bp,p.dp,p.role,p.b,p.d].join(" "))}));
+const q=document.getElementById("q"), results=document.getElementById("results"); let hits=[], hi=0;
+function search(){const terms=norm(q.value).split(/\s+/).filter(Boolean); results.innerHTML=""; if(!terms.length){results.hidden=true; hits=[]; return;}
+  hits=INDEX.filter(e=>terms.every(t=>e.hay.includes(t))).slice(0,10); hi=0;
+  results.hidden=false;
+  if(!hits.length){results.innerHTML='<li class="none">Sin resultados</li>'; return;}
+  results.innerHTML=hits.map((h,i)=>{const p=P[h.id]; return `<li><button data-pick="${h.id}" class="${i===hi?"hi":""}"><span class="rn">${esc(p.n)} <b>${esc(p.a)}</b></span><br><span class="rm">${esc(genLabel(GEN[h.id]))}${p.b?" · n. "+esc(p.b):""}${p.bp?" · "+esc(p.bp):""}</span></button></li>`;}).join("");}
+function pick(id){sel=id; reveal(id); draw(); centerOn(id,true); results.hidden=true; q.value=""; hits=[];}
+q.addEventListener("input",search);
+q.addEventListener("focus",()=>{if(q.value)search();});
+q.addEventListener("keydown",e=>{if(e.key==="ArrowDown"){hi=Math.min(hi+1,hits.length-1); search.render?.(); e.preventDefault();}
+  else if(e.key==="ArrowUp"){hi=Math.max(hi-1,0); e.preventDefault();}
+  else if(e.key==="Enter"){if(hits[hi])pick(hits[hi].id); return;}
+  else if(e.key==="Escape"){results.hidden=true; q.blur(); return;} else return;
+  results.querySelectorAll("[data-pick]").forEach((b,i)=>b.classList.toggle("hi",i===hi));});
+document.addEventListener("click",e=>{const b=e.target.closest("[data-pick]"); if(b){pick(b.dataset.pick); return;} if(!e.target.closest(".search")) results.hidden=true;});
+canvas.addEventListener("wheel",e=>{if(e.ctrlKey||e.metaKey){e.preventDefault(); setScale(scale*(e.deltaY<0?1.1:0.9));}},{passive:false});
+let drag=null;
+canvas.addEventListener("pointerdown",e=>{if(e.target.closest("button"))return; drag={x:e.clientX,y:e.clientY,l:canvas.scrollLeft,t:canvas.scrollTop}; canvas.classList.add("drag"); canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener("pointermove",e=>{if(!drag)return; canvas.scrollLeft=drag.l-(e.clientX-drag.x); canvas.scrollTop=drag.t-(e.clientY-drag.y);});
+canvas.addEventListener("pointerup",()=>{drag=null; canvas.classList.remove("drag");});
+canvas.addEventListener("pointercancel",()=>{drag=null; canvas.classList.remove("drag");});
+draw();
+requestAnimationFrame(()=>centerOn("pedro"));
+</script>
+
+</body>
+</html>
