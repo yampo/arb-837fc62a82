@@ -1,8 +1,9 @@
-# Árbol genealógico Garicoits
+# Árbol genealógico Garicoïts Lasa
 
-Árbol de la línea paterna de Juan Pablo Garicoïts, desde Soule (Francia) y Sumbilla
-(Navarra) hasta el Río de la Plata, con la línea gallega Reboredo–Lamas convergiendo
-en la misma estructura.
+Árbol de las cuatro líneas de Juan Pablo, Ariel Alejandro y María Macarena
+Garicoïts Lasa: los Garicoits de Soule y los Espelosín del Bidasoa, los Imaz y
+Muñoa de Villa del Cerro, los Reboredo de Outeiro de Rei, y los Lasa y Garrido
+del Uruguay, todas convergiendo en una sola estructura.
 
 **Ver el árbol:** abrir `index.html` en cualquier navegador, o la versión publicada
 con GitHub Pages.
