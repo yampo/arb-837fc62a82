@@ -494,6 +494,12 @@ const P = {
  juanpablo:{n:"Juan Pablo",a:"Garicoïts Lasa",c:"fam",note:"Registrado como Garicoïts, igual que su padre.",src:[["Dato de familia",""]]},
  ariel:{n:"Ariel Alejandro",a:"Garicoïts Lasa",c:"fam",note:"Dato aportado por Juan.",src:[["Dato de familia",""]]},
  macarena:{n:"María Macarena",a:"Garicoïts Lasa",c:"fam",note:"Dato aportado por Juan.",src:[["Dato de familia",""]]},
+ valeria_llamas:{n:"Valeria",a:"Llamas Lavigne",bp:"Vidal, provincia de Buenos Aires",c:"fam",
+  note:"Esposa de Ariel Alejandro Garicoïts Lasa. Nacida en Vidal, provincia de Buenos Aires, Argentina.",
+  src:[["Dato de familia (Juan Pablo Garicoïts)",""]]},
+ antonio_gl:{n:"Antonio",a:"Garicoïts Llamas",bp:"Buenos Aires",c:"fam",
+  note:"Hijo de Ariel Alejandro Garicoïts Lasa y de Valeria Llamas Lavigne. Nacido en Buenos Aires, Argentina.",
+  src:[["Dato de familia (Juan Pablo Garicoïts)",""]]},
 };
 
 /* ancestor charts: couple node = {p: father, s: mother, k:[couples of parents], of: "p"|"s" = whose parents} */
@@ -661,7 +667,7 @@ const D_MAT={p:"m_ramon_gn",s:"m_mh_montes",m:"Montevideo",d:1,k:[
     {p:"m_leonardo",s:"m_lorena",k:[{p:"m_x_leo"}]}]},
   {p:"nora_garrido",s:"walter_lasa",d:1,k:[
     {p:"adriana",s:"miguel",d:1,k:[
-      {p:"juanpablo",d:1},{p:"ariel"},
+      {p:"juanpablo",d:1},{p:"ariel",s:"valeria_llamas",k:[{p:"antonio_gl"}]},
       {p:"macarena",s:"m_landin",k:[{p:"m_sofia_l"},{p:"m_clara_l"}]}]},
     {p:"m_gabriela",s:"m_mario_dt",k:[{p:"m_mines_dt"},{p:"m_rafael_dt"}]}]},
   {p:"m_hugo",s:"m_ilda",k:[
